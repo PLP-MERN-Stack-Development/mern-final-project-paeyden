@@ -1,52 +1,121 @@
-# MERN Stack Capstone Project
+# Somesha
 
-This assignment focuses on designing, developing, and deploying a comprehensive full-stack MERN application that showcases all the skills you've learned throughout the course.
+A small learning-platform prototype (frontend + backend) built during PLP Academy. It includes a Vite + React frontend and an Express + MongoDB backend for managing users (parents / tutors / children / admin), lessons, progress tracking, messages and basic admin flows.
 
-## Assignment Overview
+---
 
-You will:
-1. Plan and design a full-stack MERN application
-2. Develop a robust backend with MongoDB, Express.js, and Node.js
-3. Create an interactive frontend with React.js
-4. Implement testing across the entire application
-5. Deploy the application to production
+## Tech Stack
+- Frontend: React (Vite), Tailwind CSS (UI), Axios for API
+- Backend: Node.js, Express, MongoDB (Mongoose)
+- Auth: JSON Web Tokens (JWT)
+- Dev tooling: nodemon (backend), Vite dev server (frontend)
 
-## Getting Started
+---
 
-1. Accept the GitHub Classroom assignment
-2. Clone the repository to your local machine
-3. Follow the instructions in the `Week8-Assignment.md` file
-4. Plan, develop, and deploy your capstone project
+## Repository Layout
+- `Backend/` — Express API server
+  - `controllers/` — route handlers
+  - `models/` — Mongoose models
+  - `routes/` — Express routers
+  - `middleware/` — auth and helper middleware
+  - `config/db.js` — MongoDB connection helper
+  - `server.js` — main server entry
 
-## Files Included
+- `somesha-frontend/` — React + Vite application
+  - `src/services/api.js` — Axios API wrapper used across the frontend
+  - `src/pages/` and `src/components/` — app UI
 
-- `Week8-Assignment.md`: Detailed assignment instructions
+---
 
-## Requirements
+## Prerequisites
+- Node.js (>= 16 recommended)
+- npm
+- MongoDB running locally or accessible via cloud (Atlas)
 
-- Node.js (v18 or higher)
-- MongoDB (local installation or Atlas account)
-- npm or yarn
-- Git and GitHub account
-- Accounts on deployment platforms (Render/Vercel/Netlify/etc.)
+---
 
-## Project Ideas
+## Environment Variables
+Create `.env` files or set environment variables for each service as shown below.
 
-The `Week8-Assignment.md` file includes several project ideas, but you're encouraged to develop your own idea that demonstrates your skills and interests.
+Backend (`Backend/.env`):
+- `MONGO_URI` (or `MONGODB_URI` / `DATABASE_URL`) — MongoDB connection string. Defaults to `mongodb://127.0.0.1:27017/somesha-dev` when unset.
+- `JWT_SECRET` — secret for signing JWTs (required for production). A `dev-secret` fallback is used in development.
+- `PORT` — optional (defaults to `5000`)
+- `NODE_ENV` — set to `development` for request logging.
 
-## Submission
+Frontend (`somesha-frontend/.env` with Vite):
+- `VITE_API_URL` — optional base API URL (e.g. `http://localhost:5000/api`). If not set, frontend falls back to `http://localhost:5000/api`.
 
-Your project will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+---
 
-1. Commit and push your code regularly
-2. Include comprehensive documentation
-3. Deploy your application and add the live URL to your README.md
-4. Create a video demonstration and include the link in your README.md
+## Quick Start (development)
+Open two terminals (one for backend, one for frontend).
 
-## Resources
+Backend (PowerShell):
+```powershell
+cd 'c:\Users\User\OneDrive\Documents\PLP Academy\Somesha--fp\Backend'
+npm install
+$env:NODE_ENV='development'; npm start
+```
 
-- [MongoDB Documentation](https://docs.mongodb.com/)
-- [Express.js Documentation](https://expressjs.com/)
-- [React Documentation](https://react.dev/)
-- [Node.js Documentation](https://nodejs.org/en/docs/)
-- [GitHub Classroom Guide](https://docs.github.com/en/education/manage-coursework-with-github-classroom) 
+Frontend (PowerShell):
+```powershell
+cd 'c:\Users\User\OneDrive\Documents\PLP Academy\Somesha--fp\somesha-frontend'
+npm install
+npm run dev
+```
+
+- The frontend dev server (Vite) will show a local URL (usually `http://localhost:5173`).
+- The backend server listens on `http://localhost:5000` by default.
+
+---
+
+## API (summary)
+All API routes are prefixed with `/api` by default as mounted in `server.js`.
+
+- Users: `/api/users`
+  - `POST /register` — register a user (payload depends on `role`)
+    - Required: `name`, `email`, `password`, `role`
+    - If `role === 'tutor'` backend expects `nationalID` (and optional `tscNumber`).
+    - If `role === 'child'` backend expects `grade`.
+  - `POST /login` — login with `email` and `password`
+  - `GET /profile` — requires JWT auth
+  - `PUT /profile` — update profile (requires JWT auth)
+
+- Lessons: `/api/lessons` (create, update, list by grade/tutor)
+- Progress: `/api/progress` (create, update, list)
+- Messages: `/api/messages` (send/receive messages)
+- Admin: `/api/admin` (verify tutors, list users)
+
+Refer to `Backend/routes/` and `Backend/controllers/` for full route details.
+
+---
+
+## Common development notes & gotchas
+- Frontend must send JSON bodies with `Content-Type: application/json`. Axios defaults are configured in `src/services/api.js`.
+- The backend uses `express.json()` to parse request bodies.
+- Username is optional (the backend schema uses a sparse unique index). If you want auto-generated usernames, consider adding slug logic on register.
+- Registering a tutor requires `nationalID`. The frontend form uses the `nationalID` field when `role === 'tutor'`.
+- Duplicate fields (email or username) return a `400` duplicate-key response with the field name.
+- JWT secrets should be set for production; a `dev-secret` is used when `JWT_SECRET` is not provided.
+
+---
+
+## Debugging tips
+- Check browser DevTools Network tab for the request payload and response body when requests fail.
+- Watch backend console logs for helpful debug messages (server prints request content-type and body for auth endpoints during development).
+- Ensure MongoDB is reachable and the `MONGO_URI` is correct.
+
+---
+
+## Contributing
+- Create feature branches from `main`.
+- Open PRs with a clear summary and tests if applicable.
+- Run the project locally (see Quick Start) and include any required env changes in the PR description.
+
+---
+
+## License & Contact
+This repository was created as part of PLP Academy exercises and is intended for learning and prototyping.
+
+
